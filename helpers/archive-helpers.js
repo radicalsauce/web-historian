@@ -37,25 +37,30 @@ exports.readListOfUrls = function(callback){
 };
 
 exports.isUrlInList = function(queryUrl){
-  exports.readListOfUrls(function(){
-      var data = arguments[0];
-      console.log("hello");
+  return exports.readListOfUrls(function(data){
     if(data.indexOf(queryUrl) !== -1){
       console.log('it is here');
+      return true;
     } else {
       console.log('nope, no good');
+      return false;
     }
   });
-
 };
 
-exports.addUrlToList = function(){
-  // if (!exports.isUrlInList) {
-  //   // add URL to list
-  // }
-  // else {
-  //   return false;
-  // }
+exports.addUrlToList = function(queryUrl){
+  console.log(exports.isUrlInList(queryUrl));
+  if (exports.isUrlInList(queryUrl)) {
+    fs.appendFile(__dirname + '/../archives/sites.txt', queryUrl + '\n', function(err, data){
+      if (err) {
+        throw err;
+      }
+      console.log('writing');
+    });
+  } else {
+    console.log('Already there.');
+    return false;
+  }
 };
 
 exports.isURLArchived = function(queryUrl){
@@ -68,23 +73,3 @@ exports.isURLArchived = function(queryUrl){
 
 exports.downloadUrls = function(){
 };
-
-
-// fs.readFile(filename, [options], callback)#
-// filename String
-// options Object
-// encoding String | Null default = null
-// flag String default = 'r'
-// callback Function
-// Asynchronously reads the entire contents of a file. Example:
-
-// fs.readFile('/etc/passwd', function (err, data) {
-//   if (err) throw err;
-//   console.log(data);
-// });
-// The callback is passed two arguments (err, data), where data is the contents of the file.
-
-// If no encoding is specified, then the raw buffer is returned.
-
-// As you progress, keep thinking about what helper functions you can put here!
-

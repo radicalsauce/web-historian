@@ -7,9 +7,13 @@ var httpHelpers = require('./http-helpers.js');
 
 exports.handleRequest = function (request, response) {
   var pathname = parseUrl(request.url).pathname.split('/').slice(1);
-  // console.log(pathname);
   console.log("Request received.");
-  console.log(archiveHelpers.isUrlInList("example1.com"));
-  response.writeHead(200, httpHelpers.headers);
-  response.end(archiveHelpers.readListOfUrls()); // archiveHelpers.paths.list);
+  if (request.url === '/favicon.ico') {
+    response.writeHead(200, {'Content-Type': 'image/x-icon'} );
+    response.end();
+  } else {
+    response.writeHead(200, httpHelpers.headers);
+    archiveHelpers.addUrlToList("www.google.com");
+    response.end(); // archiveHelpers.paths.list);
+  }
 };
