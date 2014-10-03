@@ -3,14 +3,6 @@ var path = require('path');
 var _ = require('underscore');
 var httpReq = require('http-request');
 
-  // httpReq.get('http://www.google.com', function (err, res) {
-  //   if (err) {
-  //     console.error(err);
-  //     return;
-  //   }
-  //   console.log(res.buffer.toString());
-  // });
-
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
  * Consider using the `paths` object below to store frequently used file paths. This way,
@@ -35,50 +27,51 @@ exports.initialize = function(pathsObj){
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function(callback){
-  fs.readFile(__dirname + '/../archives/sites.txt', 'utf8', function(err, data){
+  fs.readFile(exports.paths.list, function(err, data){
     if (err) {
       throw err;
     }
+    data = data + '';
     data = data.split('\n');
-    data.pop();
+    if (data[data.length - 1] === '') {
+      data.pop();
+    }
     callback(data);
   });
 };
 
-exports.isUrlInList = function(queryUrl){
-  return exports.readListOfUrls(function(data){
-    if(data.indexOf(queryUrl) !== -1){
-      console.log('it is here');
-      return true;
-    } else {
-      console.log('nope, no good');
-      return false;
-    }
-  });
+exports.isUrlInList = function(queryUrl, data, callback){
+  var there = false;
+  if(data.indexOf(queryUrl) !== -1){
+    there = true;
+  }
+  callback(there);
 };
 
 exports.addUrlToList = function(queryUrl){
-  console.log(exports.isUrlInList(queryUrl));
-  if (exports.isUrlInList(queryUrl)) {
-    fs.appendFile(__dirname + '/../archives/sites.txt', queryUrl + '\n', function(err, data){
+  exports.readListOfUrls(function(){
+    fs.appendFile(exports.paths.list, queryUrl + '\n', function(err, data){
       if (err) {
         throw err;
       }
-      console.log('writing');
     });
-  } else {
-    console.log('Already there.');
-    return false;
-  }
+  });
 };
 
-exports.isURLArchived = function(queryUrl){
-  // if (exports.isUrlInList(queryUrl)) {
-  //   return true;
-  // } else {
-  //   return false;
-  // }
+exports.isURLArchived = function(queryUrl, callback){
+  fs.readFile(path.join(exports.paths.archivedSites, queryUrl), function(err, data){
+    callback(err);
+  });
 };
 
-exports.downloadUrls = function(){
+// exports.isURLArchived = function(queryUrl, callback){
+//   if (exports.isUrlInList(queryUrl)) {
+//     return true;
+//   } else {
+//     return false;
+//   }
+// };
+
+exports.downloadUrls = function(queryUrl){
+  httpReq.get(queryUrl, path.join(exports.paths.archivedSites, queryUrl));
 };
